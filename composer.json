@@ -38,7 +38,7 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
-        "uqlibrary/elastic-client": "dev-master#d5fd99f"
+        "uqlibrary/elastic-client": "dev-master#d5fd99f72d9dd4e414687508d11421714d561d37"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
