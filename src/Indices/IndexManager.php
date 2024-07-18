@@ -3,7 +3,7 @@
 namespace Elastic\Adapter\Indices;
 
 use Elastic\Adapter\Client;
-use Elastic\Elasticsearch\Response\Elasticsearch;
+use GuzzleHttp\Ring\Future\FutureArrayInterface as Elasticsearch;
 use Illuminate\Support\Collection;
 
 class IndexManager
@@ -30,12 +30,9 @@ class IndexManager
 
     public function exists(string $indexName): bool
     {
-        /** @var Elasticsearch $response */
-        $response = $this->client->indices()->exists([
+        return $this->client->indices()->exists([
             'index' => $indexName,
         ]);
-
-        return $response->asBool();
     }
 
     public function create(Index $index): self
@@ -185,11 +182,9 @@ class IndexManager
     public function getAliases(string $indexName): Collection
     {
         /** @var Elasticsearch $response */
-        $response = $this->client->indices()->getAlias([
+        $rawResult = $this->client->indices()->getAlias([
             'index' => $indexName,
         ]);
-
-        $rawResult = $response->asArray();
 
         return collect(array_keys($rawResult[$indexName]['aliases'] ?? []));
     }

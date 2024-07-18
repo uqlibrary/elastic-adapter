@@ -3,7 +3,7 @@
 namespace Elastic\Adapter;
 
 use Elastic\Client\ClientBuilderInterface as ElasticClientBuilderInterface;
-use Elastic\Elasticsearch\Client as ElasticClient;
+use OpenSearch\Client as ElasticClient;
 
 trait Client
 {
@@ -13,13 +13,13 @@ trait Client
     public function __construct(ElasticClientBuilderInterface $clientBuilder)
     {
         $this->clientBuilder = $clientBuilder;
-        $this->client = $clientBuilder->default()->setAsync(false);
+        $this->client = $clientBuilder->default();
     }
 
     public function connection(string $name): self
     {
         $self = clone $this;
-        $self->client = $self->clientBuilder->connection($name)->setAsync(false);
+        $self->client = $self->clientBuilder->connection($name);
         return $self;
     }
 }

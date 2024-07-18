@@ -3,7 +3,7 @@
 namespace Elastic\Adapter\Search;
 
 use Elastic\Adapter\Client;
-use Elastic\Elasticsearch\Response\Elasticsearch;
+use GuzzleHttp\Ring\Future\FutureArrayInterface as Elasticsearch;
 
 final class PointInTimeManager
 {
@@ -18,17 +18,16 @@ final class PointInTimeManager
         }
 
         /** @var Elasticsearch $response */
-        $response = $this->client->openPointInTime($params);
-        $rawResult = $response->asArray();
+        $rawResult = $this->client->createPointInTime($params);
 
-        return $rawResult['id'];
+        return $rawResult['pit_id'];
     }
 
     public function close(string $pointInTimeId): self
     {
-        $this->client->closePointInTime([
+        $this->client->deletePointInTime([
             'body' => [
-                'id' => $pointInTimeId,
+                'pit_id' => $pointInTimeId,
             ],
         ]);
 

@@ -4,8 +4,7 @@ namespace Elastic\Adapter\Tests\Unit\Search;
 
 use Elastic\Adapter\Search\PointInTimeManager;
 use Elastic\Client\ClientBuilderInterface;
-use Elastic\Elasticsearch\Client;
-use Elastic\Elasticsearch\Response\Elasticsearch;
+use OpenSearch\Client;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +25,6 @@ final class PointInTimeManagerTest extends TestCase
         parent::setUp();
 
         $this->client = $this->createMock(Client::class);
-        $this->client->method('setAsync')->willReturnSelf();
 
         $clientBuilder = $this->createMock(ClientBuilderInterface::class);
         $clientBuilder->method('default')->willReturn($this->client);
@@ -36,18 +34,13 @@ final class PointInTimeManagerTest extends TestCase
 
     public function test_point_in_time_can_be_opened(): void
     {
-        $response = $this->createMock(Elasticsearch::class);
-
-        $response
-            ->expects($this->once())
-            ->method('asArray')
-            ->willReturn([
-                'id' => '46ToAwMDaWR5BXV1',
-            ]);
+        $response = [
+            'pit_id' => '46ToAwMDaWR5BXV1',
+        ];
 
         $this->client
             ->expects($this->once())
-            ->method('openPointInTime')
+            ->method('createPointInTime')
             ->with([
                 'index' => 'test',
                 'keep_alive' => '1m',
@@ -61,10 +54,10 @@ final class PointInTimeManagerTest extends TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('closePointInTime')
+            ->method('deletePointInTime')
             ->with([
                 'body' => [
-                    'id' => '46ToAwMDaWR5BXV1',
+                    'pit_id' => '46ToAwMDaWR5BXV1',
                 ],
             ]);
 
@@ -78,21 +71,19 @@ final class PointInTimeManagerTest extends TestCase
     public function test_connection_can_be_changed(): void
     {
         $defaultClient = $this->createMock(Client::class);
-        $defaultClient->method('setAsync')->willReturnSelf();
 
         $defaultClient
             ->expects($this->never())
-            ->method('closePointInTime');
+            ->method('deletePointInTime');
 
         $testClient = $this->createMock(Client::class);
-        $testClient->method('setAsync')->willReturnSelf();
 
         $testClient
             ->expects($this->once())
-            ->method('closePointInTime')
+            ->method('deletePointInTime')
             ->with([
                 'body' => [
-                    'id' => 'foo',
+                    'pit_id' => 'foo',
                 ],
             ]);
 

@@ -8,9 +8,8 @@ use Elastic\Adapter\Indices\IndexManager;
 use Elastic\Adapter\Indices\Mapping;
 use Elastic\Adapter\Indices\Settings;
 use Elastic\Client\ClientBuilderInterface;
-use Elastic\Elasticsearch\Client;
-use Elastic\Elasticsearch\Endpoints\Indices;
-use Elastic\Elasticsearch\Response\Elasticsearch;
+use OpenSearch\Client;
+use OpenSearch\Namespaces\IndicesNamespace as Indices;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -39,7 +38,6 @@ class IndexManagerTest extends TestCase
         $this->indices = $this->createMock(Indices::class);
 
         $client = $this->createMock(Client::class);
-        $client->method('setAsync')->willReturnSelf();
         $client->method('indices')->willReturn($this->indices);
 
         $clientBuilder = $this->createMock(ClientBuilderInterface::class);
@@ -79,9 +77,7 @@ class IndexManagerTest extends TestCase
     public function test_index_existence_can_be_checked(): void
     {
         $indexName = 'foo';
-
-        $response = $this->createMock(Elasticsearch::class);
-        $response->method('asBool')->willReturn(true);
+        $response = true;
 
         $this->indices
             ->expects($this->once())
@@ -346,18 +342,13 @@ class IndexManagerTest extends TestCase
         $indexName = 'foo';
         $aliasName = 'bar';
 
-        $response = $this->createMock(Elasticsearch::class);
-
-        $response
-            ->expects($this->once())
-            ->method('asArray')
-            ->willReturn([
-                $indexName => [
-                    'aliases' => [
-                        $aliasName => [],
-                    ],
+        $response = [
+            $indexName => [
+                'aliases' => [
+                    $aliasName => [],
                 ],
-            ]);
+            ],
+        ];
 
         $this->indices
             ->expects($this->once())
@@ -383,14 +374,12 @@ class IndexManagerTest extends TestCase
         $defaultIndices->expects($this->never())->method('create');
 
         $defaultClient = $this->createMock(Client::class);
-        $defaultClient->method('setAsync')->willReturnSelf();
         $defaultClient->method('indices')->willReturn($defaultIndices);
 
         $testIndices = $this->createMock(Indices::class);
         $testIndices->expects($this->once())->method('open')->with(['index' => 'docs']);
 
         $testClient = $this->createMock(Client::class);
-        $testClient->method('setAsync')->willReturnSelf();
         $testClient->method('indices')->willReturn($testIndices);
 
         $clientBuilder = $this->createMock(ClientBuilderInterface::class);

@@ -1,5 +1,5 @@
 {
-    "name": "babenkoivan/elastic-adapter",
+    "name": "uqlibrary/elastic-adapter",
     "description": "Adapter for official PHP Elasticsearch client",
     "keywords": [
         "elastic",
@@ -38,7 +38,7 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
-        "babenkoivan/elastic-client": "^2.1"
+        "uqlibrary/elastic-client": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
@@ -52,5 +52,11 @@
         "allow-plugins": {
             "php-http/discovery": true
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:uqlibrary/elastic-client"
+        }
+    ]
 }

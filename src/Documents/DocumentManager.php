@@ -6,7 +6,7 @@ use Elastic\Adapter\Client;
 use Elastic\Adapter\Exceptions\BulkOperationException;
 use Elastic\Adapter\Search\SearchParameters;
 use Elastic\Adapter\Search\SearchResult;
-use Elastic\Elasticsearch\Response\Elasticsearch;
+use GuzzleHttp\Ring\Future\FutureArrayInterface as Elasticsearch;
 use Illuminate\Support\Collection;
 
 class DocumentManager
@@ -40,8 +40,7 @@ class DocumentManager
         }
 
         /** @var Elasticsearch $response */
-        $response = $this->client->bulk($params);
-        $rawResult = $response->asArray();
+        $rawResult = $this->client->bulk($params);
 
         if ($rawResult['errors'] ?? false) {
             throw new BulkOperationException($rawResult);
@@ -76,8 +75,7 @@ class DocumentManager
         }
 
         /** @var Elasticsearch $response */
-        $response = $this->client->bulk($params);
-        $rawResult = $response->asArray();
+        $rawResult = $this->client->bulk($params);
 
         if ($rawResult['errors'] ?? false) {
             throw new BulkOperationException($rawResult);
@@ -104,8 +102,7 @@ class DocumentManager
         $params = $searchParameters->toArray();
 
         /** @var Elasticsearch $response */
-        $response = $this->client->search($params);
-        $rawResult = $response->asArray();
+        $rawResult = $this->client->search($params);
 
         return new SearchResult($rawResult);
     }

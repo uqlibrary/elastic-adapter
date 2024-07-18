@@ -9,8 +9,8 @@ use Elastic\Adapter\Exceptions\BulkOperationException;
 use Elastic\Adapter\Search\Hit;
 use Elastic\Adapter\Search\SearchParameters;
 use Elastic\Client\ClientBuilderInterface;
-use Elastic\Elasticsearch\Client;
-use Elastic\Elasticsearch\Response\Elasticsearch;
+use OpenSearch\Client;
+use GuzzleHttp\Ring\Future\FutureArrayInterface as Elasticsearch;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -39,7 +39,6 @@ final class DocumentManagerTest extends TestCase
         parent::setUp();
 
         $this->client = $this->createMock(Client::class);
-        $this->client->method('setAsync')->willReturnSelf();
 
         $clientBuilder = $this->createMock(ClientBuilderInterface::class);
         $clientBuilder->method('default')->willReturn($this->client);
@@ -236,28 +235,23 @@ final class DocumentManagerTest extends TestCase
 
     public function test_documents_can_be_found(): void
     {
-        $response = $this->createMock(Elasticsearch::class);
-
-        $response
-            ->expects($this->once())
-            ->method('asArray')
-            ->willReturn([
+        $response = [
+            'hits' => [
+                'total' => [
+                    'value' => 1,
+                    'relation' => 'eq',
+                ],
+                'max_score' => 1.601195,
                 'hits' => [
-                    'total' => [
-                        'value' => 1,
-                        'relation' => 'eq',
-                    ],
-                    'max_score' => 1.601195,
-                    'hits' => [
-                        [
-                            '_index' => 'test',
-                            '_id' => '1',
-                            '_score' => 1.601195,
-                            '_source' => ['content' => 'foo'],
-                        ],
+                    [
+                        '_index' => 'test',
+                        '_id' => '1',
+                        '_score' => 1.601195,
+                        '_source' => ['content' => 'foo'],
                     ],
                 ],
-            ]);
+            ],
+        ];
 
         $this->client
             ->expects($this->once())
@@ -290,16 +284,11 @@ final class DocumentManagerTest extends TestCase
 
     public function test_exception_is_thrown_when_index_operation_was_unsuccessful(): void
     {
-        $response = $this->createMock(Elasticsearch::class);
-
-        $response
-            ->expects($this->once())
-            ->method('asArray')
-            ->willReturn([
-                'took' => 0,
-                'errors' => true,
-                'items' => [],
-            ]);
+        $response = [
+            'took' => 0,
+            'errors' => true,
+            'items' => [],
+        ];
 
         $this->client
             ->expects($this->once())
@@ -330,14 +319,12 @@ final class DocumentManagerTest extends TestCase
     public function test_connection_can_be_changed(): void
     {
         $defaultClient = $this->createMock(Client::class);
-        $defaultClient->method('setAsync')->willReturnSelf();
 
         $defaultClient
             ->expects($this->never())
             ->method('bulk');
 
         $testClient = $this->createMock(Client::class);
-        $testClient->method('setAsync')->willReturnSelf();
 
         $testClient
             ->expects($this->once())
