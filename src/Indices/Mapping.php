@@ -46,6 +46,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
  * @method $this sparseVector(string $name)
  * @method $this text(string $name, array $parameters = null)
  * @method $this tokenCount(string $name, array $parameters = null)
+ * @method $this unsignedLong(string $name, array $parameters = null)
  * @method $this wildcard(string $name, array $parameters = null)
  */
 final class Mapping implements Arrayable
@@ -56,10 +57,7 @@ final class Mapping implements Arrayable
     private ?bool $isSourceEnabled;
     private MappingProperties $properties;
     private array $dynamicTemplates = [];
-    /**
-     * @var string|bool|null
-     */
-    private $dynamic;
+    private string|bool|null $dynamic;
 
     public function __construct()
     {
@@ -133,7 +131,7 @@ final class Mapping implements Arrayable
             ];
         }
 
-        if(isset($this->dynamic)) {
+        if (isset($this->dynamic)) {
             $mapping['dynamic'] = $this->dynamic;
         }
 
